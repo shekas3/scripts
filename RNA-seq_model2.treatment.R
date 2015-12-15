@@ -25,6 +25,9 @@ res_contrast_simulation_SD_VS_SWW <- results(DESeq_data,
 summary(res_contrast_simulation_SD_VS_SWW)
 head(res_contrast_simulation_SD_VS_SWW)
 DESeq2::plotMA(res_contrast_simulation_SD_VS_SWW)
+DESeq2::plotMA(res_contrast_simulation_SD_VS_SWW, main = "DESeq2", ylim=c(-2,2))
+
+
 res_contrast_simulation_SRW_VS_SWW <- results(DESeq_data, 
                                              contrast=list(c("treatment_SRW_vs_SWW")), 
                                              pAdjustMethod="BH")
@@ -32,7 +35,7 @@ res_contrast_simulation_SRW_VS_SWW <- results(DESeq_data,
 summary(res_contrast_simulation_SRW_VS_SWW)
 
 DESeq2::plotMA(res_contrast_simulation_SRW_VS_SWW)
-
+DESeq2::plotMA(res_contrast_simulation_SRW_VS_SWW, main = "DESeq2", ylim=c(-2,2))
 
 
 
