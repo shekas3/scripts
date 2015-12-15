@@ -34,4 +34,4 @@ hmcol <- colorRampPalette(brewer.pal(9, "GnBu"))(100)  # picking our colours
 #Now we generate the plot
 heatmap.2(mat, Rowv=as.dendrogram(hc),
           symm=TRUE, trace="none",
-          col = rev(hmcol), margin=c(13, 13))
+          col = rev(hmcol), margin=c(17, 17))
