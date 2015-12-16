@@ -2,25 +2,26 @@ library(DESeq2)
 library(edgeR)
 library(RColorBrewer)
 library(gplots)
+# importing the second Model and experimental design
 experimental_design2 <- read.csv("c:/Users/guest6/Desktop/FinalProject/results/experimental_design2.csv", header = TRUE)
 model2.counts <- read.csv("c:/Users/guest6/Desktop/FinalProject/results/model2.counts.csv")
 rownames(model2.counts) <- model2.counts$X
 model2.counts$X <- NULL
 experimental_design2$X <- NULL
-
+# design DESeq formula 
 DESeq_data <- DESeqDataSetFromMatrix(model2.counts, experimental_design2, 
-                                     design = formula(~ simulation + treatment + simulation:treatment))
-DESeq_data$treatment <- relevel(DESeq_data$treatment, "SWW")
+                                     design = formula(~ simulation + treatment + simulation:treatment)) #comparinf trteatment within each simulation
+DESeq_data$treatment <- relevel(DESeq_data$treatment, "SWW") # set SWW as a reference treatment
 DESeq_data <- DESeq(DESeq_data)
-DESeq_data2 <- results(DESeq_data, alpha=0.05)
+DESeq_data2 <- results(DESeq_data, alpha=0.05) # incorporate p-values less than 0.05
 attr(DESeq_data , "modelMatrixType")
 summary(DESeq_data2, alpha= 0.05)
-plotDispEsts(DESeq_data)
+plotDispEsts(DESeq_data) # plot mean-dispersion
 head(DESeq_data2)
 resultsNames(DESeq_data)
 
 SD_VS_SWW <- results(DESeq_data, 
-                     contrast=list(c("treatment_SD_vs_SWW")), 
+                     contrast=list(c("simulation_SD_vs_SWW")), # comparing SD to SWW within each simulation
                      pAdjustMethod="BH")
 
 summary(SD_VS_SWW)
@@ -28,7 +29,7 @@ head(SD_VS_SWW)
 DESeq2::plotMA(SD_VS_SWW)
 DESeq2::plotMA(SD_VS_SWW, main = "DESeq2", ylim=c(-2,2))
 
-
+#making a data.frame for custom MAplot
 
 SD_VS_SWW<- SD_VS_SWW[order(SD_VS_SWW$padj),]
 SD_VS_SWW_dat <- data.frame(SD_VS_SWW@listData$baseMean, SD_VS_SWW@listData$log2FoldChange, SD_VS_SWW@listData$padj )
@@ -44,14 +45,15 @@ abline(a=0, b=0 , col="blue")
 
 
 
-
 SRW_VS_SWW <- results(DESeq_data, 
-                    contrast=list(c("treatment_SRW_vs_SWW")), 
+                    contrast=list(c("treatment_SRW_vs_SWW")), # comparing SRW to SWW within each simulation
                      pAdjustMethod="BH")
 
 summary(SRW_VS_SWW)
 DESeq2::plotMA(SRW_VS_SWW)
 DESeq2::plotMA(SRW_VS_SWW, main = "DESeq2", ylim=c(-2,2))
+
+#making a data.frame for custom MAplot
 
 SRW_VS_SWW<- SRW_VS_SWW[order(SRW_VS_SWW$padj),]
 SRW_VS_SWW_dat <- data.frame(SRW_VS_SWW@listData$baseMean, SRW_VS_SWW@listData$log2FoldChange, SRW_VS_SWW@listData$padj )

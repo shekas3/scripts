@@ -2,8 +2,8 @@ library(splitstackshape)
 library(dplyr)
 setwd("~/bio720/counts_htseq/")
 path = "~/bio720/counts_htseq/"
-#calculating the nuymber of mapped reads exclude multimappers etc (unique counts) and import the dataset
-mapped.reads <- read.csv("~/bio720/uniq_mapped.txt", header = TRUE, sep = "\t")
+# import the data from HTseq
+# create a forlooop to tidy up the data and perform simulation
 file.names <- dir(path, pattern = ".htsq")
 file.counts <- list ()
 total.counts <- list ()
@@ -19,15 +19,15 @@ simuSamples3 <- list()
 simuSamples4 <- list()
 simuSamples5 <- list()
 for(i in 1:length(file.names)){
-  file.counts[[ file.names[i] ]] <- read.table(file.names[i], header = FALSE, sep = "\t", col.names = c("genes", "count"))
-  total.counts[[ file.names[i] ]] <- expandRows(file.counts[[i]], "count")
-  unique.mapped[[ file.names[i] ]] <- nrow(total.counts[[i]])
-  resample1[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ]
-  resample2[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ]
+  file.counts[[ file.names[i] ]] <- read.table(file.names[i], header = FALSE, sep = "\t", col.names = c("genes", "count")) # read the data
+  total.counts[[ file.names[i] ]] <- expandRows(file.counts[[i]], "count") # this function from splitstackshape replicate a gene name based on it's count
+  unique.mapped[[ file.names[i] ]] <- nrow(total.counts[[i]]) # calculate total number of counts in each sample for re-sampling
+  resample1[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ] #re-sampling from total counts without replacement (Bootstrap)
+  resample2[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ] #Five round of re-sampling
   resample3[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ]
   resample4[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ]
   resample5[[ file.names[i] ]] <- total.counts[[i]][sample(unique.mapped[[i]], replace = TRUE), ]
-  simuSamples1[[ file.names[i] ]] <- data.frame(table(resample1[[i]]))
+  simuSamples1[[ file.names[i] ]] <- data.frame(table(resample1[[i]])) # reshape the resample data based on unique gene names
   simuSamples2[[ file.names[i] ]] <- data.frame(table(resample2[[i]]))
   simuSamples3[[ file.names[i] ]] <- data.frame(table(resample3[[i]]))
   simuSamples4[[ file.names[i] ]] <- data.frame(table(resample4[[i]]))
@@ -39,9 +39,9 @@ for(i in 1:length(file.names)){
   colnames(simuSamples5[[file.names[i]]]) <- c("genes", "count")
 }
 #unlist and combination of count data
-#total gene names from htseq count
 tot_count_sample <- matrix(unlist(lapply(file.counts, function(x) x$count)), nrow=26351, ncol=6)
 colnames(tot_count_sample) <- c("SD_1_R", "SD_2_R", "SRW_1_R", "SRW_2_R", "SWW_1_R", "SWW_2_R")
+#total gene names from htseq count
 total_genes <- matrix(unlist(lapply(file.counts, function(x) x$gene)), nrow=26351, ncol=1)
 colnames(total_genes) <- "genes"
 #combination of count data from First round of simulation

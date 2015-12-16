@@ -2,22 +2,25 @@ library(DESeq2)
 library(edgeR)
 library(RColorBrewer)
 library(gplots)
+#Importing the counts from model1 and experimental model 1
 experimental_design1 <- read.csv("c:/Users/guest6/Desktop/FinalProject/results/experimental_design1.csv", header = TRUE)
 modell.counts <- read.csv("c:/Users/guest6/Desktop/FinalProject/results/model1.counts.csv")
 rownames(modell.counts) <- modell.counts$X
 modell.counts$X <- NULL
 experimental_design1$X <- NULL
-
+#Input the data into DESeq package: it starts with formula
+#first we check for lane effect
 test_lane_effects <- DESeqDataSetFromMatrix(modell.counts, experimental_design1, 
                                             design = formula(~ lane))
 
-test_lane_effects2 <- DESeq(test_lane_effects) # We know fit the simple model
-test_lane_effects2_results <- results(test_lane_effects2)
-summary(test_lane_effects2_results)
+test_lane_effects2 <- DESeq(test_lane_effects) # calculate differential gene expression
+test_lane_effects2_results <- results(test_lane_effects2) # results
+#up regulated and down regulated log2 fold changes of genes from lane to lane
+summary(test_lane_effects2_results) # summary of results 
 plotDispEsts(test_lane_effects2) 
 #Principal Components analysis and hierarchical clustering to visualize patterns (and to identify potential confounds)
 for_pca <- rlog(test_lane_effects2, blind=TRUE) 
-plotPCA(for_pca, intgroup=c("lane")) # no obvious lane effects.
+plotPCA(for_pca, intgroup=c("lane")) # slightly lane effect
 
 plotPCA(for_pca, intgroup=c("replicate", "barcode"))
 
